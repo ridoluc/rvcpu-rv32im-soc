@@ -1,0 +1,87 @@
+
+program.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+80000000 <_start>:
+.section .text
+.global _start
+
+_start:
+    # Initialize the stack pointer
+    la sp, _stack
+80000000:	20000113          	li	sp,512
+
+    # Copy .data from IMEM to DMEM
+    la a0, _data_load_start       # Load destination address (start of .data in DMEM)
+80000004:	80000517          	auipc	a0,0x80000
+80000008:	07850513          	addi	a0,a0,120 # 7c <_data_load_end>
+    la a1, _data_start          # Load source address (start of .data in IMEM)
+8000000c:	10000593          	li	a1,256
+    la a2, _data_load_end         # Load end address of .data in DMEM
+80000010:	80000617          	auipc	a2,0x80000
+80000014:	06c60613          	addi	a2,a2,108 # 7c <_data_load_end>
+
+80000018 <copy_data>:
+copy_data:
+    beq a0, a2, call_main    # If all .data is copied, jump to clear_bss
+80000018:	00c50c63          	beq	a0,a2,80000030 <call_main>
+    lw t0, 0(a0)             # Load word from source
+8000001c:	00052283          	lw	t0,0(a0)
+    sw t0, 0(a1)             # Store word to destination
+80000020:	0055a023          	sw	t0,0(a1)
+    addi a0, a0, 4           # Increment destination pointer
+80000024:	00450513          	addi	a0,a0,4
+    addi a1, a1, 4           # Increment source pointer
+80000028:	00458593          	addi	a1,a1,4
+    j copy_data              # Repeat
+8000002c:	fedff06f          	j	80000018 <copy_data>
+
+80000030 <call_main>:
+
+    # Call main
+call_main:
+    call main                # Call the main function
+80000030:	008000ef          	jal	80000038 <main>
+
+80000034 <exit>:
+
+    # Infinite loop after main
+exit:
+80000034:	0000006f          	j	80000034 <exit>
+
+80000038 <main>:
+//     return 0;
+// }
+
+
+/// @brief  Test program to read GPIO inputs and write them to GPIO outputs
+int main(){
+80000038:	fe010113          	addi	sp,sp,-32
+8000003c:	00812e23          	sw	s0,28(sp)
+80000040:	02010413          	addi	s0,sp,32
+
+    const int * GPIO_base = (int *) 0x00000000; // Base address for GPIO
+80000044:	fe042623          	sw	zero,-20(s0)
+    int * GPIO_out =  (int *) (GPIO_base + 0); // GPIO output register
+80000048:	fec42783          	lw	a5,-20(s0)
+8000004c:	fef42423          	sw	a5,-24(s0)
+    int * GPIO_dir =  (int *) (GPIO_base + 1); // GPIO direction register
+80000050:	fec42783          	lw	a5,-20(s0)
+80000054:	00478793          	addi	a5,a5,4
+80000058:	fef42223          	sw	a5,-28(s0)
+    int * GPIO_in =   (int *) (GPIO_base + 3); // GPIO input register    
+8000005c:	fec42783          	lw	a5,-20(s0)
+80000060:	00c78793          	addi	a5,a5,12
+80000064:	fef42023          	sw	a5,-32(s0)
+
+    // *GPIO_dir = 0b11110000; // Example: Set GPIOs 0-3 as outputs, 4-7 as inputs
+
+    while (1){
+        *GPIO_out = *GPIO_in; // Read inputs and write to outputs
+80000068:	fe042783          	lw	a5,-32(s0)
+8000006c:	0007a703          	lw	a4,0(a5)
+80000070:	fe842783          	lw	a5,-24(s0)
+80000074:	00e7a023          	sw	a4,0(a5)
+80000078:	ff1ff06f          	j	80000068 <main+0x30>
