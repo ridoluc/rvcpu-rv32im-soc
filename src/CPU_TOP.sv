@@ -6,7 +6,7 @@
 // `define USE_COMPILED_SRAM 
 
 // Uncomment this line to program the instruction memory with a binary file
-`define PROGRAM_MEMORY 
+// `define PROGRAM_MEMORY 
 
 // Uncomment this line to expose the Wishbone bus for external peripherals
 // `define EXPOSE_WB_BUS 

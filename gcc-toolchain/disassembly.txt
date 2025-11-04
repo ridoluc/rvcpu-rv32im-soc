@@ -16,12 +16,12 @@ _start:
     # Copy .data from IMEM to DMEM
     la a0, _data_load_start       # Load destination address (start of .data in DMEM)
 80000004:	80000517          	auipc	a0,0x80000
-80000008:	0c050513          	addi	a0,a0,192 # c4 <_data_load_end>
+80000008:	0a850513          	addi	a0,a0,168 # ac <_data_load_start>
     la a1, _data_start          # Load source address (start of .data in IMEM)
 8000000c:	10000593          	li	a1,256
     la a2, _data_load_end         # Load end address of .data in DMEM
 80000010:	80000617          	auipc	a2,0x80000
-80000014:	0b460613          	addi	a2,a2,180 # c4 <_data_load_end>
+80000014:	0ac60613          	addi	a2,a2,172 # bc <_data_load_end>
 
 80000018 <copy_data>:
 copy_data:
@@ -52,70 +52,51 @@ exit:
 80000034:	0000006f          	j	80000034 <exit>
 
 80000038 <main>:
-//     }
+
 // }
 
+int global_var[4] = {10,12,-32,52};
 
-// Test program to write to UART at address 0x00000040
-int main() {
-80000038:	fd010113          	addi	sp,sp,-48
-8000003c:	02812623          	sw	s0,44(sp)
-80000040:	03010413          	addi	s0,sp,48
-    volatile int * uart = (int *)0x00000040; // UART base address
-80000044:	04000793          	li	a5,64
-80000048:	fef42623          	sw	a5,-20(s0)
-    volatile int * uart_control = (int *)(uart + 2); // UART control register
-8000004c:	fec42783          	lw	a5,-20(s0)
-80000050:	00878793          	addi	a5,a5,8
-80000054:	fef42423          	sw	a5,-24(s0)
-    volatile int * uart_read = (int *)(uart + 1); // UART read register
-80000058:	fec42783          	lw	a5,-20(s0)
-8000005c:	00478793          	addi	a5,a5,4
-80000060:	fef42223          	sw	a5,-28(s0)
+int main(){
+80000038:	fe010113          	addi	sp,sp,-32
+8000003c:	00812e23          	sw	s0,28(sp)
+80000040:	02010413          	addi	s0,sp,32
 
+    int a = 0;
+80000044:	fe042623          	sw	zero,-20(s0)
+    for (int i = 0; i < 4; i++)
+80000048:	fe042423          	sw	zero,-24(s0)
+8000004c:	0300006f          	j	8000007c <main+0x44>
+    {
+        a += global_var[i];
+80000050:	10000713          	li	a4,256
+80000054:	fe842783          	lw	a5,-24(s0)
+80000058:	00279793          	slli	a5,a5,0x2
+8000005c:	00f707b3          	add	a5,a4,a5
+80000060:	0007a783          	lw	a5,0(a5)
+80000064:	fec42703          	lw	a4,-20(s0)
+80000068:	00f707b3          	add	a5,a4,a5
+8000006c:	fef42623          	sw	a5,-20(s0)
+    for (int i = 0; i < 4; i++)
+80000070:	fe842783          	lw	a5,-24(s0)
+80000074:	00178793          	addi	a5,a5,1
+80000078:	fef42423          	sw	a5,-24(s0)
+8000007c:	fe842703          	lw	a4,-24(s0)
+80000080:	00300793          	li	a5,3
+80000084:	fce7d6e3          	bge	a5,a4,80000050 <main+0x18>
+    }
     
-    int * uart_baud = (int *)(uart + 3); // UART baud rate register
-80000064:	fec42783          	lw	a5,-20(s0)
-80000068:	00c78793          	addi	a5,a5,12
-8000006c:	fef42023          	sw	a5,-32(s0)
-    
-    // UART BAUD counter set arbitrarily to 100 matching the testbench  
-    // For real tests set the BAUD register according to the actual CPU frequency.
-    // Example: CPU Freq = 50MHz, Baud rate = 9600
-    // UART Baud setting = 50,000,000 / 9,600 = 5208
-    *uart_baud = 100;
-80000070:	fe042783          	lw	a5,-32(s0)
-80000074:	06400713          	li	a4,100
-80000078:	00e7a023          	sw	a4,0(a5)
-    
+    int * res = (int *)0x00000000;
+80000088:	fe042223          	sw	zero,-28(s0)
+    *res = a; // Store result in GPIO
+8000008c:	fe442783          	lw	a5,-28(s0)
+80000090:	fec42703          	lw	a4,-20(s0)
+80000094:	00e7a023          	sw	a4,0(a5)
 
-    int count_max =0;
-8000007c:	fc042e23          	sw	zero,-36(s0)
-    int counter = 0;
-80000080:	fc042c23          	sw	zero,-40(s0)
-        //     *uart = message[i]; // Write character to UART
-        //     // delay_1s(); // Delay to ensure UART is ready
-        // }
-
-        // RECEIVE CHARACTER AND ECHO BACK
-        if(*uart_control & 0x08) { // Check if UART is ready to read
-80000084:	fe842783          	lw	a5,-24(s0)
-80000088:	0007a783          	lw	a5,0(a5)
-8000008c:	0087f793          	andi	a5,a5,8
-80000090:	fe078ae3          	beqz	a5,80000084 <main+0x4c>
-            char data = *uart_read; // Read data from UART
-80000094:	fe442783          	lw	a5,-28(s0)
-80000098:	0007a783          	lw	a5,0(a5)
-8000009c:	fcf40ba3          	sb	a5,-41(s0)
-            while (*uart_control & 0x01); // Wait until UART buffer is not full
-800000a0:	00000013          	nop
-800000a4:	fe842783          	lw	a5,-24(s0)
-800000a8:	0007a783          	lw	a5,0(a5)
-800000ac:	0017f793          	andi	a5,a5,1
-800000b0:	fe079ae3          	bnez	a5,800000a4 <main+0x6c>
-            *uart = data; // Echo the received character back
-800000b4:	fd744703          	lbu	a4,-41(s0)
-800000b8:	fec42783          	lw	a5,-20(s0)
-800000bc:	00e7a023          	sw	a4,0(a5)
-        if(*uart_control & 0x08) { // Check if UART is ready to read
-800000c0:	fc5ff06f          	j	80000084 <main+0x4c>
+    return 0;
+80000098:	00000793          	li	a5,0
+}
+8000009c:	00078513          	mv	a0,a5
+800000a0:	01c12403          	lw	s0,28(sp)
+800000a4:	02010113          	addi	sp,sp,32
+800000a8:	00008067          	ret
