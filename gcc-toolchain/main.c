@@ -115,74 +115,61 @@
 
 
 /// @brief  Test program to read GPIO inputs and write them to GPIO outputs
-int main(){
+// int main(){
 
-    const int * GPIO_base = (int *) 0x00000000; // Base address for GPIO
-    int * GPIO_out =  (int *) (GPIO_base + 0); // GPIO output register
-    int * GPIO_dir =  (int *) (GPIO_base + 1); // GPIO direction register
-    int * GPIO_in =   (int *) (GPIO_base + 3); // GPIO input register    
+//     const int * GPIO_base = (int *) 0x00000000; // Base address for GPIO
+//     int * GPIO_out =  (int *) (GPIO_base + 0); // GPIO output register
+//     int * GPIO_dir =  (int *) (GPIO_base + 1); // GPIO direction register
+//     int * GPIO_in =   (int *) (GPIO_base + 3); // GPIO input register    
 
-    // *GPIO_dir = 0b11110000; // Example: Set GPIOs 0-3 as outputs, 4-7 as inputs
+//     // *GPIO_dir = 0b11110000; // Example: Set GPIOs 0-3 as outputs, 4-7 as inputs
 
-    while (1){
-        *GPIO_out = *GPIO_in; // Read inputs and write to outputs
-    }
-}
+//     while (1){
+//         *GPIO_out = *GPIO_in; // Read inputs and write to outputs
+//     }
+// }
 
 
 // Test program to write to UART at address 0x00000040
-// int main() {
-//     volatile int * uart = (int *)0x00000040; // UART base address
-//     volatile int * uart_control = (int *)(uart + 2); // UART control register
-//     volatile int * uart_read = (int *)(uart + 1); // UART read register
+int main() {
+    volatile int * uart = (int *)0x00000040; // UART base address
+    volatile int * uart_control = (int *)(uart + 2); // UART control register
+    volatile int * uart_read = (int *)(uart + 1); // UART read register
+
     
-//     int * GPIO_out =  (int *) 0x00000000;
-//     int * GPIO_in =   (int *) 0x0000000C; // GPIO input register
-
-//     char message[] = "Hello UART\n\r";
+    int * uart_baud = (int *)(uart + 3); // UART baud rate register
     
-//     int * uart_baud = (int *)(uart + 3); // UART baud rate register
-//     *uart_baud = 100;//5208;
+    // UART BAUD counter set arbitrarily to 100 matching the testbench  
+    // For real tests set the BAUD register according to the actual CPU frequency.
+    // Example: CPU Freq = 50MHz, Baud rate = 9600
+    // UART Baud setting = 50,000,000 / 9,600 = 5208
+    *uart_baud = 100;
     
-//     // delay_1s(); // Delay to ensure UART is ready
 
-//     // for (int i = 0; i < 12; i++) {
-//     //     while (*uart_control & 0x01); // Wait until UART buffer is not full
-//     //     *uart = message[i]; // Write character to UART
-//     //     // delay_1s(); // Delay to ensure UART is ready
-//     // }
+    int count_max =0;
+    int counter = 0;
 
-//     int count_max =0;
-//     int counter = 0;
+    // char message[] = "Hello UART\n\r";
 
-//     while(1){
-        
-//         // count_max = *GPIO_in;
-//         // counter++;
-//         // if(counter > count_max) {
-//         //     counter = 0; // Reset count if it exceeds max
-//         // }
-//         // *GPIO_out = counter; // Read GPIO inputs and write to GPIO outputs
+    while(1){
 
-//         // delay_1s(); // Delay to allow UART to process
+        // RECEIVE STRING
+        // for (int i = 0; i < 12; i++) {
+        //     while (*uart_control & 0x01); // Wait until UART buffer is not full
+        //     *uart = message[i]; // Write character to UART
+        //     // delay_1s(); // Delay to ensure UART is ready
+        // }
 
+        // RECEIVE CHARACTER AND ECHO BACK
+        if(*uart_control & 0x08) { // Check if UART is ready to read
+            char data = *uart_read; // Read data from UART
+            while (*uart_control & 0x01); // Wait until UART buffer is not full
+            *uart = data; // Echo the received character back
+        }
+    }
 
-//         *GPIO_out = *GPIO_in;
-//         // for (int i = 0; i < 12; i++) {
-//         //     while (*uart_control & 0x01); // Wait until UART buffer is not full
-//         //     *uart = message[i]; // Write character to UART
-//         //     // delay_1s(); // Delay to ensure UART is ready
-//         // }
-
-//         if(*uart_control & 0x08) { // Check if UART is ready to read
-//             char data = *uart_read; // Read data from UART
-//             while (*uart_control & 0x01); // Wait until UART buffer is not full
-//             *uart = data; // Echo the received character back
-//         }
-//     }
-
-//     return 0;
-// }
+    return 0;
+}
 
 
 // int main() {
