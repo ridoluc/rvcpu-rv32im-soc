@@ -2,7 +2,7 @@
 PROJECT = SYSTEM_TOP
 
 # Verilog Source Files (you can add more Verilog files here)
-VERILOG_SOURCES = ../../src/CPU_TOP.sv ../../src/RVCPU.sv ../../src/Instr_mem.sv ../../src/RAM.sv ../../src/registers.sv ../../src/ALU.sv ../../src/CPU_control.sv ../../src/ALU_dec.sv ../../src/Instr_dec.sv ../../src/Imm_extend.sv ../../src/Mem_dec.sv ../../src/mux4to1.sv ../../src/Wishbone_master.sv ../../src/GPIO.sv ../../src/JTAG.sv ../../src/Programming_controller.sv ../../src/Muldiv.sv ../../src/UART.sv ../../src/Timer.sv ../../src/EXT_WRAPPER.sv
+VERILOG_SOURCES = ../../src/CPU_TOP.sv ../../src/RVCPU.sv ../../src/Instr_mem.sv ../../src/RAM.sv ../../src/registers.sv ../../src/ALU.sv ../../src/CPU_control.sv ../../src/ALU_dec.sv ../../src/Instr_dec.sv ../../src/Imm_extend.sv ../../src/Mem_dec.sv ../../src/mux4to1.sv ../../src/Wishbone_master.sv ../../src/GPIO.sv ../../src/JTAG.sv ../../src/Programming_controller.sv ../../src/Muldiv.sv ../../src/UART.sv ../../src/Timer.sv
 
 # C++ Testbench File
 TESTBENCH_CPP = ./GPIO_tb.cpp

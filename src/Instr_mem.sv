@@ -80,7 +80,7 @@ reg [31:0] data_out;
 
 `ifdef PROGRAM_MEMORY
     initial begin
-        $readmemb("./support/instr_mem.bin", instruction_memory);
+        $readmemb("./instr_mem.bin", instruction_memory);
     end
 `endif // PROGRAM_MEMORY
 

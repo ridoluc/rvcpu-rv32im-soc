@@ -1,7 +1,20 @@
+/**
+ * @file GPIO_tb.cpp
+ * @brief Testbench for the GPIO interface in VSYSTEM_TOP (Verilator).
+ *
+ * Drives gpio_in with an 8-bit counter (0..255), pulses the clock,
+ * asserts/deasserts reset at start, and monitors gpio_out for changes.
+ * If gpio_out does not change within a configurable timeout (100 cycles),
+ * the test reports a timeout and exits. A VCD waveform ("waveform.vcd")
+ * is produced for post-simulation inspection.
+ *
+ * @author ridoluc
+ * @date 2025-11
+ */
 
 #include "VSYSTEM_TOP.h"
 #include "verilated.h"
-#include <verilated_vcd_c.h> // Add this line
+#include <verilated_vcd_c.h> 
 #include "VSYSTEM_TOP___024root.h"
 #include <iostream>
 #include <iomanip> 
