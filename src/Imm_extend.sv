@@ -1,12 +1,32 @@
 /*
-*  RVCPU - Simple RISC-V CPU
-* 
-*  Author:  ridoluc
-*  Date:    Jan 2025
-*
-*  This module extends the immediate value of the instruction to 32 bits.
-*  It rearranges the bits from the instruction based on instruction type
-*/
+ * Project:    RVCPU: SystemVerilog SoC implementing a RV32IM CPU
+ *
+ * Author:     ridoluc
+ * Date:       2025-11
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Copyright (c) 2025 Luca Ridolfi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 
 
 
@@ -30,7 +50,7 @@ module Imm_extend (
             B: imm = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
             U: imm = {instr[31:12], 12'b0};
             J: imm = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0}; 
-            default: imm = 32'b0;  // Maybe equal to I?
+            default: imm = 32'b0;  
         endcase
     end
 

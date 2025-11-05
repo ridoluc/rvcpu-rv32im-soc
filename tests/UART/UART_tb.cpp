@@ -143,9 +143,9 @@ int main(int argc, char** argv) {
 
     char data=1;
 
-    // for(int i = 0; i < 30; i++) {
-    //     clk_tick(top); // Clock tick to allow system to stabilize
-    // }
+    for(int i = 0; i < 30; i++) {
+        clk_tick(top); // Clock tick to allow system to stabilize
+    }
 
     char msg[] = "Hello, UART!";
     char* msg_ptr = msg;

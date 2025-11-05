@@ -1,11 +1,32 @@
 /*
-*  RVCPU - Simple RISC-V CPU
-* 
-*  Author:  ridoluc
-*  Date:    Jan 2025
-*
-*  Instruction memory module reads the instruction memory file and outputs the instruction at the PC.
-*/
+ * Project:    RVCPU: SystemVerilog SoC implementing a RV32IM CPU
+ *
+ * Author:     ridoluc
+ * Date:       2025-11
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Copyright (c) 2025 Luca Ridolfi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 
 
 `default_nettype none
@@ -41,14 +62,14 @@ reg [31:0] data_out;
     TSDN65LPLLA1024X32M4M instruction_memory(
         .AA({2'b00, PC[MEM_ADDR_WIDTH-1:2]}), // Registered Address input
         .DA(mem_wdata),               // Data input
-        .BWEBA({32{~mem_we}}),         // Byte write enable
+        .BWEBA({32{~mem_we}}),        // Byte write enable
         .WEBA(~mem_we),               // Write enable Write=0/Read=1
         .CEBA(1'b0),                  // Chip enable Active low
         .CLKA(clk),                   // Clock input
 
         .AB({2'b00, wb_adr_i[MEM_ADDR_WIDTH-1:2]}), // Address input for Wishbone
         .DB(wb_dat_i),                     // Data input for Wishbone
-        .BWEBB({32{1'b1}}),                   // Byte write enable for Wishbone Active low
+        .BWEBB({32{1'b1}}),                // Byte write enable for Wishbone Active low
         .WEBB(1'b1),                       // Write enable for Wishbone - Read only (Write=0/Read=1)
         .CEBB(~(wb_cyc_i && wb_stb_i)),    // Chip enable for Wishbone - Active low
         .CLKB(clk),                        // Clock input for Wishbone

@@ -1,32 +1,52 @@
 /*
-*  RVCPU - Simple RISC-V CPU
-* 
-*  Author:  ridoluc
-*  Date:    Jan 2025
-*
-*  Simple implementation of a RISC-V CPU. The CPU is single-cycle and implements the RV32I ISA variant. 
-*  The CPU comprises of the following components:
-*  - Program Counter
-*  - Instruction Memory
-*  - Register File
-*  - ALU
-*  - Data Memory
-*  - Immediate Extender
-*  - Branch Unit
-*  - Control Unit
-*     - Instruction Decoder
-*     - ALU Control
-*  - Muxes
-*     - Data sources (ALU, Memory, Immediate, PC) to Register File
-*     - ALU sources (Register, Immediate) to ALU
-*/
+ * Project:    RVCPU: SystemVerilog SoC implementing a RV32IM CPU
+ *
+ * Author:     ridoluc
+ * Date:       2025-11
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Copyright (c) 2025 Luca Ridolfi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 
 
 /*
-    ROM size = 2^10 = 1024
-    PC size = 32
-    Data Memory size = 2^8 = 256 
-*/
+ *
+ *  Simple implementation of a RISC-V CPU. The CPU is single-cycle and implements the RV32I ISA variant. 
+ *  The CPU comprises of the following components:
+ *  - Program Counter
+ *  - Instruction Memory
+ *  - Register File
+ *  - ALU
+ *  - Data Memory
+ *  - Immediate Extender
+ *  - Branch Unit
+ *  - Control Unit
+ *     - Instruction Decoder
+ *     - ALU Control
+ *  - Muxes
+ *     - Data sources (ALU, Memory, Immediate, PC) to Register File
+ *     - ALU sources (Register, Immediate) to ALU
+ */
 
 
 module RVCPU #(
@@ -78,7 +98,7 @@ module RVCPU #(
 
 
     wire [PC_SIZE-1:0] next_pc_br_unit; // Next PC from branch unit
-    wire [PC_SIZE-1:0] pc_to_rd; // Next PC from branch unit
+    wire [PC_SIZE-1:0] pc_to_rd;    // Next PC from branch unit
     wire [PC_SIZE-1:0] next_pc;     // Next PC after mux for JALR instruction
     wire [31:0] extended_imm;       // Extended Immediate
 
@@ -100,8 +120,8 @@ module RVCPU #(
     wire alu_negative;          // ALU Negative
     wire pc_sel;
     wire [2:0] funct3;          // Funct3 field for ALU operations
-    wire stall; // Stall signal to control the flow of the CPU
-    wire alu_done;             // ALU Done signal
+    wire stall;                 // Stall signal to control the flow of the CPU
+    wire alu_done;              // ALU Done signal
 
     wire do_branch;
     wire [PC_SIZE-1:0] pc_plus_4;
