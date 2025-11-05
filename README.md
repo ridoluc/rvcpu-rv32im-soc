@@ -63,9 +63,7 @@ peripheral region from `32'h10000000` to `32'h000FFFFF`.
 
 ## Getting started / Simulation
 
-- Build and run the Verilator testbenches in `tests/` (each test directory
-	contains a Makefile). Copy `instr_mem.bin` produced by `gcc-toolchain` into
-	the testbench working directory so the DUT can load the instruction memory.
+Build and run the Verilator testbenches in `tests/` (each test directory contains a Makefile). Copy `instr_mem.bin` produced by `gcc-toolchain` into the testbench working directory so the DUT can load the instruction memory.
 
 <!-- ## CPU Diagram
 <img src="./support/img/CPU_schem.png" alt="Schematic of the CPU" width="600" style="max-width:100%;height:auto;" />

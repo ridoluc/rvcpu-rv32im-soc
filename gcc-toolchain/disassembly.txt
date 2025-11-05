@@ -16,12 +16,12 @@ _start:
     # Copy .data from IMEM to DMEM
     la a0, _data_load_start       # Load destination address (start of .data in DMEM)
 80000004:	80000517          	auipc	a0,0x80000
-80000008:	0a850513          	addi	a0,a0,168 # ac <_data_load_start>
+80000008:	0d050513          	addi	a0,a0,208 # d4 <_data_load_end>
     la a1, _data_start          # Load source address (start of .data in IMEM)
 8000000c:	10000593          	li	a1,256
     la a2, _data_load_end         # Load end address of .data in DMEM
 80000010:	80000617          	auipc	a2,0x80000
-80000014:	0ac60613          	addi	a2,a2,172 # bc <_data_load_end>
+80000014:	0c460613          	addi	a2,a2,196 # d4 <_data_load_end>
 
 80000018 <copy_data>:
 copy_data:
@@ -53,50 +53,65 @@ exit:
 
 80000038 <main>:
 
+//     return 0;
 // }
 
-int global_var[4] = {10,12,-32,52};
 
 int main(){
-80000038:	fe010113          	addi	sp,sp,-32
-8000003c:	00812e23          	sw	s0,28(sp)
-80000040:	02010413          	addi	s0,sp,32
+80000038:	fd010113          	addi	sp,sp,-48
+8000003c:	02812623          	sw	s0,44(sp)
+80000040:	03010413          	addi	s0,sp,48
 
-    int a = 0;
-80000044:	fe042623          	sw	zero,-20(s0)
-    for (int i = 0; i < 4; i++)
-80000048:	fe042423          	sw	zero,-24(s0)
-8000004c:	0300006f          	j	8000007c <main+0x44>
-    {
-        a += global_var[i];
-80000050:	10000713          	li	a4,256
-80000054:	fe842783          	lw	a5,-24(s0)
-80000058:	00279793          	slli	a5,a5,0x2
-8000005c:	00f707b3          	add	a5,a4,a5
-80000060:	0007a783          	lw	a5,0(a5)
-80000064:	fec42703          	lw	a4,-20(s0)
-80000068:	00f707b3          	add	a5,a4,a5
-8000006c:	fef42623          	sw	a5,-20(s0)
-    for (int i = 0; i < 4; i++)
-80000070:	fe842783          	lw	a5,-24(s0)
-80000074:	00178793          	addi	a5,a5,1
-80000078:	fef42423          	sw	a5,-24(s0)
-8000007c:	fe842703          	lw	a4,-24(s0)
-80000080:	00300793          	li	a5,3
-80000084:	fce7d6e3          	bge	a5,a4,80000050 <main+0x18>
-    }
-    
-    int * res = (int *)0x00000000;
-80000088:	fe042223          	sw	zero,-28(s0)
-    *res = a; // Store result in GPIO
-8000008c:	fe442783          	lw	a5,-28(s0)
-80000090:	fec42703          	lw	a4,-20(s0)
-80000094:	00e7a023          	sw	a4,0(a5)
+    const int * ext_peripheral = (int *) 0x10000000; // Base address for EXT peripheral
+80000044:	100007b7          	lui	a5,0x10000
+80000048:	fef42623          	sw	a5,-20(s0)
+    int * ext_control_reg = (int *) (ext_peripheral + 0); // Control register at offset 0
+8000004c:	fec42783          	lw	a5,-20(s0)
+80000050:	fef42423          	sw	a5,-24(s0)
+    int * ext_opA = (int *) (ext_peripheral + 1); // Register 1
+80000054:	fec42783          	lw	a5,-20(s0)
+80000058:	00478793          	addi	a5,a5,4 # 10000004 <_stack+0xffffe04>
+8000005c:	fef42223          	sw	a5,-28(s0)
+    int * ext_opB = (int *) (ext_peripheral + 2); // Register 2
+80000060:	fec42783          	lw	a5,-20(s0)
+80000064:	00878793          	addi	a5,a5,8
+80000068:	fef42023          	sw	a5,-32(s0)
+    volatile int * ext_result = (int *) (ext_peripheral + 3); // Result register at offset 3
+8000006c:	fec42783          	lw	a5,-20(s0)
+80000070:	00c78793          	addi	a5,a5,12
+80000074:	fcf42e23          	sw	a5,-36(s0)
+
+    *ext_opA = 126; // Write to register 1
+80000078:	fe442783          	lw	a5,-28(s0)
+8000007c:	07e00713          	li	a4,126
+80000080:	00e7a023          	sw	a4,0(a5)
+    *ext_opB = 76; // Write to register 2
+80000084:	fe042783          	lw	a5,-32(s0)
+80000088:	04c00713          	li	a4,76
+8000008c:	00e7a023          	sw	a4,0(a5)
+
+    // Wait for control bit 0 to be 1
+    while ((*ext_control_reg & 0x01) == 0);
+80000090:	00000013          	nop
+80000094:	fe842783          	lw	a5,-24(s0)
+80000098:	0007a783          	lw	a5,0(a5)
+8000009c:	0017f793          	andi	a5,a5,1
+800000a0:	fe078ae3          	beqz	a5,80000094 <main+0x5c>
+    int value = *ext_result; // Read from result register
+800000a4:	fdc42783          	lw	a5,-36(s0)
+800000a8:	0007a783          	lw	a5,0(a5)
+800000ac:	fcf42c23          	sw	a5,-40(s0)
+
+    volatile int * gpio = (int *) 0x00000000; // GPIO base address
+800000b0:	fc042a23          	sw	zero,-44(s0)
+    *gpio = value; // Write value to GPIO
+800000b4:	fd442783          	lw	a5,-44(s0)
+800000b8:	fd842703          	lw	a4,-40(s0)
+800000bc:	00e7a023          	sw	a4,0(a5)
 
     return 0;
-80000098:	00000793          	li	a5,0
-}
-8000009c:	00078513          	mv	a0,a5
-800000a0:	01c12403          	lw	s0,28(sp)
-800000a4:	02010113          	addi	sp,sp,32
-800000a8:	00008067          	ret
+800000c0:	00000793          	li	a5,0
+800000c4:	00078513          	mv	a0,a5
+800000c8:	02c12403          	lw	s0,44(sp)
+800000cc:	03010113          	addi	sp,sp,48
+800000d0:	00008067          	ret
