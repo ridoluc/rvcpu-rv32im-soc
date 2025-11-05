@@ -9,7 +9,7 @@
 `define PROGRAM_MEMORY 
 
 // Uncomment this line to expose the Wishbone bus for external peripherals
-`define EXPOSE_WB_BUS 
+// `define EXPOSE_WB_BUS 
 
 
 

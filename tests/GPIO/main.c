@@ -12,3 +12,28 @@ int main(){
         *GPIO_out = *GPIO_in; // Read inputs and write to outputs
     }
 }
+
+
+
+/**
+ * Test program for MULDIV unit
+ *  
+ */ 
+
+// int global_var[5] = {70,146,1601,150, 670};
+
+// int main(){
+
+//     int a = 0;
+
+//     a = global_var[0];
+//     a *= global_var[1];
+//     a *= global_var[2];
+//     a /= global_var[3];
+//     a /= global_var[4];
+    
+//     int * res = (int *)0x00000000;
+//     *res = a; // Store result in GPIO
+
+//     return 0;
+// }
