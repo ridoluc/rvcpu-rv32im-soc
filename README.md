@@ -16,15 +16,27 @@ The instruction memory can be programmed via the JTAG interface (see the
 `gcc-toolchain` and `tests/` folders for examples and testbenches).
 
 ## Peripherals and registers
+The SoC exposes three memory‑mapped peripherals (GPIO, UART and a 32‑bit Timer). Each peripheral provides a small set of control and status registers described briefly below.
 
-The repository includes a compact summary of peripheral base addresses and
-internal registers:
+- GPIO
+    - Direction register (per‑pin): configures each I/O as input or output.
+    - Data register: read inputs / write outputs.
+    - Pull‑up enable (per‑pin): optional pull‑up configuration (if the hardware supports it).
+
+- UART
+    - Data registers: 8‑bit transmit and receive data registers.
+    - Baud rate register: 16‑bit divisor/baud configuration register.
+    - Control / Status register: status bits indicate transmit in‑progress, transmitter buffer full, and receive complete (plus other control/status flags as implemented).
+
+- Timer
+    - Counter: 32‑bit up‑counter.
+    - Prescaler: 32‑bit prescaler/divider that slows the counter increments.
+    - Compare register: 32‑bit compare/match value; a match sets a status flag.
+
+All peripherals are memory‑mapped under the peripheral region; the register map image below for offsets and exact bit assignments.
 
 <img src="./support/img/Peripheral_reg_summary.PNG" alt="SoC block diagram" width="600" style="max-width:100%;height:auto;" />
 
-If you enable the directive `\`define EXPOSE_WB_BUS\`` the Wishbone bus
-interface is exposed so additional peripherals can be attached from a top
-level testbench or external module.
 
 ## Folder layout
 
@@ -47,8 +59,7 @@ Refer to `gcc-toolchain/README.md` for details and troubleshooting.
 
 When `EXPOSE_WB_BUS` is defined the top-level exposes the Wishbone bus. You
 can add external peripherals by connecting them to the bus — map them into the
-peripheral region starting at `32'h10000000` with a maximum span of
-`32'h00100000`.
+peripheral region from `32'h10000000` to `32'h000FFFFF`.
 
 ## Getting started / Simulation
 
@@ -56,4 +67,7 @@ peripheral region starting at `32'h10000000` with a maximum span of
 	contains a Makefile). Copy `instr_mem.bin` produced by `gcc-toolchain` into
 	the testbench working directory so the DUT can load the instruction memory.
 
+<!-- ## CPU Diagram
+<img src="./support/img/CPU_schem.png" alt="Schematic of the CPU" width="600" style="max-width:100%;height:auto;" />
+ -->
 
